@@ -1,87 +1,44 @@
-import React from "react";
-import { Button, Space } from "antd";
+import React, { useEffect, useRef } from "react";
+import { Button } from "antd";
 import { useDrop } from "react-dnd";
 import { ItemType } from "@/editor/item-type";
-interface Component {
-  /**
-   * 唯一标识
-   */
-  id: number;
-
-  /**
-   * 组件名称
-   */
-  name: string;
-
-  /**
-   * 组件属性
-   */
-  props: any;
-
-  /**
-   * 子组件
-   */
-  children?: Component[];
-}
+import { Component, useComponents } from "@/editor/stores/components";
+import Space from "@/editor/components/space";
+import SelectedMask from "@/editor/common/selected-mask";
 
 const ComponentMap: { [key: string]: any } = {
   Button: Button,
   Space: Space,
 };
 
-const components: Component[] = [
-  {
-    id: 1,
-    name: "Button",
-    props: {
-      type: "primary",
-      children: "按钮",
-      danger: true,
-    },
-  },
-  {
-    id: 2,
-    name: "Space",
-    props: {
-      size: "large",
-    },
-    children: [
-      {
-        id: 3,
-        name: "Button",
-        props: {
-          type: "dashed",
-          children: "按钮1",
-          className: "bg-indigo-600",
-        },
-      },
-      {
-        id: 4,
-        name: "Button",
-        props: {
-          type: "default",
-          children: "按钮2",
-        },
-      },
-    ],
-  },
-];
-
 export const Stage: React.FC = () => {
+  const { components, setCurComponentId, curComponentId } = useComponents();
+
+  const selectedMaskRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (selectedMaskRef?.current) {
+      selectedMaskRef?.current.updatePosition();
+    }
+  }, [components]);
   function renderComponents(components: Component[]): React.ReactNode {
     return components.map((component: Component) => {
-      if (!component) {
+      if (!ComponentMap?.[component?.name]) {
         return null;
       }
 
       if (ComponentMap[component.name]) {
         return React.createElement(
           ComponentMap[component.name],
-          { key: component.id, id: component.id, ...component.props },
+          {
+            key: component.id,
+            id: component.id,
+            "data-component-id": component.id,
+            ...component.props,
+          },
           component.props.children || renderComponents(component.children || [])
         );
       }
-      return null;
     });
   }
 
@@ -104,13 +61,48 @@ export const Stage: React.FC = () => {
     }),
   }));
 
+  useEffect(() => {
+    function createMask(e: any) {
+      const path = e.composedPath();
+      for (let i = 0; i < path.length; i++) {
+        const ele = path[i];
+        if (ele.getAttribute) {
+          if (ele.getAttribute("data-component-id")) {
+            const componentId = ele.getAttribute("data-component-id");
+            setCurComponentId(+componentId);
+            return;
+          }
+        }
+      }
+    }
+    let container = document.querySelector(".stage");
+    if (container) {
+      container.addEventListener("click", createMask, true);
+    }
+    return () => {
+      container = document.querySelector(".stage");
+      if (container) {
+        container.removeEventListener("click", createMask, true);
+      }
+    };
+  }, []);
+
   return (
     <div
-      className="p-[24px] h-full"
+      className="p-[24px] h-full stage"
       ref={drop}
-      style={{ border: canDrop ? "1px solid #ccc" : "none" }}
+      style={{ border: canDrop ? "1px solid rgb(124,77,255)" : "none" }}
     >
       {renderComponents(components)}
+      {curComponentId && (
+        <SelectedMask
+          componentId={curComponentId}
+          containerClassName="select-mask-container"
+          offsetContainerClassName="stage"
+          ref={selectedMaskRef}
+        />
+      )}
+      <div className="select-mask-container" />
     </div>
   );
 };

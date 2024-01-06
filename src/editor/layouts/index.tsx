@@ -3,7 +3,7 @@ import "allotment/dist/style.css";
 import { Header } from "./header";
 import { Material } from "./material";
 import { Stage } from "./renderer";
-import { Setting } from "./setting";
+import {Setting} from "./setting";
 export const Layout: React.FC = () => {
   return (
     <div className="h-screen flex flex-col">

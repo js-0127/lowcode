@@ -3,26 +3,35 @@ import "allotment/dist/style.css";
 import { Header } from "./header";
 import { Material } from "./material";
 import { Stage } from "./renderer";
-import {Setting} from "./setting";
+import { Setting } from "./setting";
+import { useComponents } from "../stores/components";
+import { ProdStage } from "./renderer/prod";
 export const Layout: React.FC = () => {
+  const { mode } = useComponents();
   return (
     <div className="h-screen flex flex-col">
-      <div className="h-[50px] flex items-center bg-red-300">
+      <div className="h-[50px] flex items-center border-[1px] border-solid border-gray-300">
         <Header />
       </div>
-      <Allotment>
-        <Allotment.Pane preferredSize={200} maxSize={400} minSize={200}>
-          <Material />
-        </Allotment.Pane>
+      {mode === "edit" ? (
+        <Allotment>
+          <Allotment.Pane preferredSize={200} maxSize={400} minSize={200}>
+            <Material />
+          </Allotment.Pane>
 
+          <Allotment.Pane>
+            <Stage />
+          </Allotment.Pane>
+
+          <Allotment.Pane preferredSize={300} maxSize={500} minSize={300}>
+            <Setting />
+          </Allotment.Pane>
+        </Allotment>
+      ) : (
         <Allotment.Pane>
-          <Stage />
+          <ProdStage />
         </Allotment.Pane>
-
-        <Allotment.Pane preferredSize={200} maxSize={400} minSize={200}>
-          <Setting />
-        </Allotment.Pane>
-      </Allotment>
+      )}
     </div>
   );
 };

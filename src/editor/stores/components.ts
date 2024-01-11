@@ -9,8 +9,9 @@ export interface Component {
 
 interface State {
   components: Component[];
-  curComponentId?: number;
+  curComponentId?: number | null;
   curComponent: Component | null;
+  mode: "edit" | "preview";
 }
 interface Action {
   /**
@@ -21,16 +22,21 @@ interface Action {
   /**
    * 设置当前组件id
    */
-  setCurComponentId: (componentId: number) => void;
+  setCurComponentId: (componentId: State["curComponentId"]) => void;
 
   /**
    * 更改当前组件属性
    */
   updateComponentProps: (componentId: number, props: any) => void;
+
+  /**
+   * 更改模式
+   */
+  setMode: (mode: State["mode"]) => void;
 }
 
 function getComponentById(
-  id: number,
+  id: State["curComponentId"],
   components: Component[]
 ): ReturnType<Component | any> {
   for (const component of components) {
@@ -49,6 +55,7 @@ function getComponentById(
 export const useComponents = create<State & Action>((set, get) => ({
   components: [],
   curComponent: null,
+  mode: "edit",
   addComponent: (component: Component, parentId: number) => {
     set((state) => {
       if (parentId) {
@@ -65,7 +72,7 @@ export const useComponents = create<State & Action>((set, get) => ({
       return { components: [...state.components, component] };
     });
   },
-  setCurComponentId: (componentId: number) => {
+  setCurComponentId: (componentId: State["curComponentId"]) => {
     const state = get();
 
     return set({
@@ -74,6 +81,8 @@ export const useComponents = create<State & Action>((set, get) => ({
     });
   },
   updateComponentProps: (componentId: number, props) => {
+    
+
     set((state) => {
       const component = getComponentById(componentId, state.components);
       if (component) {
@@ -84,10 +93,15 @@ export const useComponents = create<State & Action>((set, get) => ({
             components: [...state.components],
           };
         }
-        return { components: [...state.components] };
       }
 
       return { components: [...state.components] };
+    });
+  },
+
+  setMode: (mode: State["mode"]) => {
+    set(() => {
+      return { mode: mode };
     });
   },
 }));

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getComponentById } from "@/editor/utils/getComponentById";
 
 export interface Component {
   id: number;
@@ -35,23 +36,6 @@ interface Action {
   setMode: (mode: State["mode"]) => void;
 }
 
-function getComponentById(
-  id: State["curComponentId"],
-  components: Component[]
-): ReturnType<Component | any> {
-  for (const component of components) {
-    if (id === component.id) {
-      return component;
-    }
-    if (component.children && component.children.length > 0) {
-      const res = getComponentById(id, component.children);
-      if (res) {
-        return res;
-      }
-    }
-  }
-}
-
 export const useComponents = create<State & Action>((set, get) => ({
   components: [],
   curComponent: null,
@@ -77,12 +61,10 @@ export const useComponents = create<State & Action>((set, get) => ({
 
     return set({
       curComponentId: componentId,
-      curComponent: getComponentById(componentId, state.components),
+      curComponent: getComponentById(componentId as number, state.components),
     });
   },
   updateComponentProps: (componentId: number, props) => {
-    
-
     set((state) => {
       const component = getComponentById(componentId, state.components);
       if (component) {

@@ -1,7 +1,8 @@
 import { ItemType } from "@/editor/item-type";
-import { useComponents } from "@/editor/stores/components";
-import { Collapse, Input, Select } from "antd";
-import { useCallback } from "react";
+import { Component, useComponents } from "@/editor/stores/components";
+import { getComponentById } from "@/editor/utils/getComponentById";
+import { Collapse, Input, Select, TreeSelect } from "antd";
+import { useCallback, useState } from "react";
 
 export const componentEventMap = {
   [ItemType.Button]: [
@@ -12,9 +13,25 @@ export const componentEventMap = {
   ],
 };
 
+export const componentMethodMap = {
+  [ItemType.Button]: [
+    {
+      name: "startLoading",
+      label: "开始loading",
+    },
+    {
+      name: "endLoading",
+      label: "结束loading",
+    },
+  ],
+};
+
 export const ComponentEvent: React.FC = () => {
-  const { updateComponentProps, curComponentId, curComponent } =
+  const { updateComponentProps, curComponentId, curComponent, components } =
     useComponents();
+
+  const [selectedComponent, setSelectedComponent] =
+    useState<Component | null>();
 
   // 事件类型改变
   const typeChange = useCallback(
@@ -60,6 +77,44 @@ export const ComponentEvent: React.FC = () => {
     },
     [curComponentId, updateComponentProps]
   );
+
+  //组件改变
+  const componentChange = useCallback(
+    (eventName: string, value: number) => {
+      if (!curComponentId) return;
+      setSelectedComponent(getComponentById(value, components));
+      updateComponentProps(curComponentId, {
+        [eventName]: {
+          ...curComponent?.props?.[eventName],
+          config: {
+            ...curComponent?.props?.[eventName]?.config,
+            componentId: value,
+          },
+        },
+      });
+    },
+    [curComponentId, getComponentById, updateComponentProps]
+  );
+
+  //组件方法改变
+
+  const componentMethodChange = useCallback(
+    (eventName: string, value: string) => {
+      if (!curComponentId) return null;
+
+      updateComponentProps(curComponentId, {
+        [eventName]: {
+          ...curComponent?.props?.[eventName],
+          config: {
+            ...curComponent?.props?.[eventName]?.config,
+            method: value,
+          },
+        },
+      });
+    },
+    [curComponentId, updateComponentProps]
+  );
+
   if (!curComponent) return null;
   return (
     <div className="px-[12px]">
@@ -72,7 +127,10 @@ export const ComponentEvent: React.FC = () => {
                 <div>
                   <Select
                     style={{ width: 160 }}
-                    options={[{ label: "显示提示", value: "showMessage" }]}
+                    options={[
+                      { label: "显示提示", value: "showMessage" },
+                      { label: "组件方法", value: "componentFunction" },
+                    ]}
                     onChange={(value) => {
                       typeChange(setting.name, value);
                     }}
@@ -118,6 +176,57 @@ export const ComponentEvent: React.FC = () => {
                       ></Input>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {curComponent?.props?.[setting.name]?.type ===
+                "componentFunction" && (
+                <div className="flex flex-col gap-[12px] mt-[12px]">
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  >
+                    <div>组件：</div>
+                    <div>
+                      <TreeSelect
+                        className="w-[160px]"
+                        treeData={components}
+                        fieldNames={{
+                          label: "name",
+                          value: "id",
+                        }}
+                        onChange={(value) => {
+                          componentChange(setting.name, value);
+                        }}
+                        value={
+                          curComponent?.props?.[setting.name]?.config
+                            ?.componentId
+                        }
+                      ></TreeSelect>
+                    </div>
+                  </div>
+                  {componentMethodMap[selectedComponent?.name || ""] && (
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <div>方法：</div>
+                      <div>
+                        <Select
+                          className="w-[160px]"
+                          options={componentMethodMap[
+                            selectedComponent?.name || ""
+                          ]?.map((method) => {
+                            return { label: method.label, value: method.name };
+                          })}
+                          value={
+                            curComponent?.props?.[setting.name]?.config?.method
+                          }
+                          onChange={(value) => {
+                            componentMethodChange(setting?.name, value);
+                          }}
+                        ></Select>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </Collapse.Panel>

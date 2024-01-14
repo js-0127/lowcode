@@ -1,7 +1,8 @@
-import React from "react";
-import { Button, message } from "antd";
+import React, { useRef } from "react";
+import { message } from "antd";
 import { Component, useComponents } from "@/editor/stores/components";
 import Space from "@/editor/components/space";
+import Button from "@/editor/components/button";
 
 import { componentEventMap } from "@/editor/layouts/setting/component-event";
 
@@ -12,6 +13,8 @@ const ComponentMap: { [key: string]: any } = {
 
 export const ProdStage: React.FC = () => {
   const { components } = useComponents();
+
+  const componentRefs = useRef<any>({});
 
   function handleEvent(component: Component) {
     const props: any = {};
@@ -30,6 +33,15 @@ export const ProdStage: React.FC = () => {
               } else if (config?.type === "error") {
                 message?.error(config?.text);
               }
+            } else {
+              if (type === "componentFunction") {
+                const component = componentRefs.current[config.componentId];
+                if (component) {
+                  console.log(config);
+
+                  component[config.method]?.();
+                }
+              }
             }
           };
         }
@@ -41,7 +53,6 @@ export const ProdStage: React.FC = () => {
   function renderComponents(components: Component[]): React.ReactNode {
     return components.map((component: Component) => {
       const props = handleEvent(component);
-      console.log(props);
 
       if (!ComponentMap?.[component?.name]) {
         return null;
@@ -53,6 +64,9 @@ export const ProdStage: React.FC = () => {
           {
             key: component.id,
             id: component.id,
+            ref: (ref) => {
+              componentRefs.current[component.id] = ref;
+            },
             "data-component-id": component.id,
             ...component.props,
             ...props,

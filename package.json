@@ -10,12 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "allotment": "^1.19.4",
     "antd": "^5.12.6",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
+    "rollup-plugin-visualizer": "^5.12.0",
     "zustand": "^4.4.7"
   },
   "devDependencies": {

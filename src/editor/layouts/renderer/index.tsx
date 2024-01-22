@@ -21,6 +21,8 @@ export const Stage: React.FC = () => {
       selectedMaskRef?.current.updatePosition();
     }
   }, [components]);
+
+  
   function renderComponents(components: Component[]): React.ReactNode {
     return components.map((component: Component) => {
       if (!ComponentMap?.[component?.name]) {

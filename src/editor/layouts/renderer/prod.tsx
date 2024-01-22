@@ -18,7 +18,6 @@ export const ProdStage: React.FC = () => {
 
   function handleEvent(component: Component) {
     const props: any = {};
-
     if (componentEventMap[component?.name]?.length) {
       componentEventMap[component?.name]?.forEach((event) => {
         const eventConfig = component?.props[event.name];
@@ -37,8 +36,6 @@ export const ProdStage: React.FC = () => {
               if (type === "componentFunction") {
                 const component = componentRefs.current[config.componentId];
                 if (component) {
-                  console.log(config);
-
                   component[config.method]?.();
                 }
               }

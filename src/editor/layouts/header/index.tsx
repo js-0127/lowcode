@@ -2,25 +2,43 @@ import { useComponents } from "@/editor/stores/components";
 import { Button, Space } from "antd";
 import ComponentTree from "./component-tree";
 import { useCallback, useState } from "react";
+import { DefineVariable } from "./define-variable";
 
 export const Header: React.FC = () => {
   const { mode, setMode, setCurComponentId } = useComponents();
   const [open, setOpen] = useState<boolean>(false);
 
+  const [variableVisible, setVariableVisible] = useState<boolean>(false);
   const onOpen = useCallback(() => {
     setOpen(true);
-  }, [open]);
+  }, []);
   const onCancle = useCallback(() => {
     setOpen(false);
-  }, [open]);
-  
+  }, []);
+
+  const handleVariableCancle = useCallback(() => {
+    setVariableVisible(false);
+  }, []);
+
   return (
     <div className="flex justify-end w-[100%] px-[24px]">
       <Space>
         <Button type="primary" onClick={onOpen}>
-          组件树
+          查看大纲
+        </Button>
+        <Button
+          type="primary"
+          onClick={() => {
+            setVariableVisible(true);
+          }}
+        >
+          定义变量
         </Button>
         <ComponentTree open={open} onCancle={onCancle} />
+        <DefineVariable
+          open={variableVisible}
+          onCancle={handleVariableCancle}
+        ></DefineVariable>
         {mode === "edit" && (
           <Button
             type="primary"

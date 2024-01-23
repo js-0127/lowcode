@@ -1,6 +1,7 @@
+import { SettingFormItemInput } from "@/editor/common/setting-form-item/input";
 import { ItemType } from "@/editor/item-type";
 import { useComponents } from "@/editor/stores/components";
-import { Form, Input, Select } from "antd";
+import { Form, Select } from "antd";
 import { useEffect } from "react";
 
 const componentSettingMap = {
@@ -91,7 +92,7 @@ export const ComponentAttr: React.FC = () => {
 
   useEffect(() => {
     form.setFieldsValue(curComponent?.props);
-  }, []);
+  }, [curComponent]);
 
   /**
    * 动态渲染表单元素
@@ -104,7 +105,7 @@ export const ComponentAttr: React.FC = () => {
     if (type === "select") {
       return <Select options={options} />;
     } else if (type === "input") {
-      return <Input />;
+      return <SettingFormItemInput />;
     }
   }
 
@@ -114,6 +115,8 @@ export const ComponentAttr: React.FC = () => {
    */
   function valueChange(changeValues: any) {
     if (curComponentId) {
+      console.log(changeValues);
+
       updateComponentProps(curComponentId, changeValues);
     }
   }

@@ -7,7 +7,7 @@ interface Props {
   open: boolean;
   onCancle: () => void;
 }
-export const DefineVariable: React.FC<Props> = ({ open, onCancle }) => {
+export const DefineVariableModal: React.FC<Props> = ({ open, onCancle }) => {
   const [form] = Form.useForm();
 
   const { variables, setVariables } = useVariable();

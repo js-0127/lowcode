@@ -2,7 +2,7 @@ import { useComponents } from "@/editor/stores/components";
 import { Button, Space } from "antd";
 import ComponentTree from "./component-tree";
 import { useCallback, useState } from "react";
-import { DefineVariable } from "./define-variable";
+import { DefineVariableModal } from "./define-variable";
 
 export const Header: React.FC = () => {
   const { mode, setMode, setCurComponentId } = useComponents();
@@ -35,10 +35,10 @@ export const Header: React.FC = () => {
           定义变量
         </Button>
         <ComponentTree open={open} onCancle={onCancle} />
-        <DefineVariable
+        <DefineVariableModal
           open={variableVisible}
           onCancle={handleVariableCancle}
-        ></DefineVariable>
+        ></DefineVariableModal>
         {mode === "edit" && (
           <Button
             type="primary"

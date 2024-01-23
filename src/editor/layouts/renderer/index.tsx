@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import { Button } from "antd";
 import { useDrop } from "react-dnd";
 import { ItemType } from "@/editor/item-type";
 import { Component, useComponents } from "@/editor/stores/components";
 import Space from "@/editor/components/space";
+import Button from "@/editor/components/button";
 import SelectedMask from "@/editor/common/selected-mask";
 
 const ComponentMap: { [key: string]: any } = {
@@ -22,7 +22,6 @@ export const Stage: React.FC = () => {
     }
   }, [components]);
 
-  
   function renderComponents(components: Component[]): React.ReactNode {
     return components.map((component: Component) => {
       if (!ComponentMap?.[component?.name]) {

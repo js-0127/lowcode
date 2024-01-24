@@ -20,7 +20,7 @@ const Button = (props: any, ref: any) => {
 
   return (
     <AntdButton loading={loading} {...props}>
-      {props?.text?.value || "按钮"}
+      {props?.text || "按钮"}
     </AntdButton>
   );
 };

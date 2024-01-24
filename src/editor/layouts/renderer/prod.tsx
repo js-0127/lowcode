@@ -5,6 +5,8 @@ import Space from "@/editor/components/space";
 import Button from "@/editor/components/button";
 
 import { componentEventMap } from "@/editor/layouts/setting/component-event";
+import { useVariable } from "@/editor/stores/variable";
+import { useFormatProps } from "@/editor/layouts/renderer/hooks/useFormatProps";
 
 const ComponentMap: { [key: string]: any } = {
   Button: Button,
@@ -12,8 +14,10 @@ const ComponentMap: { [key: string]: any } = {
 };
 
 export const ProdStage: React.FC = () => {
-  const { components } = useComponents();
+  const { components, mode } = useComponents();
+  const { variables } = useVariable();
 
+  const formatProps = useFormatProps(mode, variables);
   const componentRefs = useRef<any>({});
 
   function handleEvent(component: Component) {
@@ -49,7 +53,8 @@ export const ProdStage: React.FC = () => {
 
   function renderComponents(components: Component[]): React.ReactNode {
     return components.map((component: Component) => {
-      const props = handleEvent(component);
+      let props = formatProps(component);
+      props = { ...props, ...handleEvent(component) };
 
       if (!ComponentMap?.[component?.name]) {
         return null;

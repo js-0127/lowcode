@@ -5,14 +5,18 @@ import { Component, useComponents } from "@/editor/stores/components";
 import Space from "@/editor/components/space";
 import Button from "@/editor/components/button";
 import SelectedMask from "@/editor/common/selected-mask";
-
+import { useFormatProps } from "@/editor/layouts/renderer/hooks/useFormatProps";
+import { useVariable } from "@/editor/stores/variable";
 const ComponentMap: { [key: string]: any } = {
   Button: Button,
   Space: Space,
 };
 
 export const Stage: React.FC = () => {
-  const { components, setCurComponentId, curComponentId } = useComponents();
+  const { components, setCurComponentId, curComponentId, mode } =
+    useComponents();
+  const { variables } = useVariable();
+  const formatProps = useFormatProps(mode, variables);
 
   const selectedMaskRef = useRef<any>(null);
 
@@ -28,6 +32,7 @@ export const Stage: React.FC = () => {
         return null;
       }
 
+      const props = formatProps(component);
       if (ComponentMap[component.name]) {
         return React.createElement(
           ComponentMap[component.name],
@@ -35,7 +40,7 @@ export const Stage: React.FC = () => {
             key: component.id,
             id: component.id,
             "data-component-id": component.id,
-            ...component.props,
+            ...props,
           },
           component.props.children || renderComponents(component.children || [])
         );
@@ -94,7 +99,9 @@ export const Stage: React.FC = () => {
       ref={drop}
       style={{ border: canDrop ? "1px solid rgb(124,77,255)" : "none" }}
     >
-      {renderComponents(components)}
+      <React.Suspense fallback="loading...">
+        {renderComponents(components)}
+      </React.Suspense>
       {curComponentId && (
         <SelectedMask
           componentId={curComponentId}

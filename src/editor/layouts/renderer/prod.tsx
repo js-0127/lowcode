@@ -7,6 +7,7 @@ import Button from "@/editor/components/button";
 import { componentEventMap } from "@/editor/layouts/setting/component-event";
 import { useVariable } from "@/editor/stores/variable";
 import { useFormatProps } from "@/editor/layouts/renderer/hooks/useFormatProps";
+import { usePageDataStore } from "@/editor/stores/page-data";
 
 const ComponentMap: { [key: string]: any } = {
   Button: Button,
@@ -16,8 +17,9 @@ const ComponentMap: { [key: string]: any } = {
 export const ProdStage: React.FC = () => {
   const { components, mode } = useComponents();
   const { variables } = useVariable();
+  const { data, setData } = usePageDataStore();
 
-  const formatProps = useFormatProps(mode, variables);
+  const formatProps = useFormatProps(mode, variables, data);
   const componentRefs = useRef<any>({});
 
   function handleEvent(component: Component) {
@@ -36,12 +38,16 @@ export const ProdStage: React.FC = () => {
               } else if (config?.type === "error") {
                 message?.error(config?.text);
               }
-            } else {
-              if (type === "componentFunction") {
-                const component = componentRefs.current[config.componentId];
-                if (component) {
-                  component[config.method]?.();
-                }
+            } else if (type === "componentFunction") {
+              const component = componentRefs.current[config.componentId];
+              if (component) {
+                component[config.method]?.();
+              }
+            } else if (type === "setVariable") {
+              const { variable, value } = config;
+
+              if (variable && value) {
+                setData(variable, value);
               }
             }
           };

@@ -7,6 +7,7 @@ import Button from "@/editor/components/button";
 import SelectedMask from "@/editor/common/selected-mask";
 import { useFormatProps } from "@/editor/layouts/renderer/hooks/useFormatProps";
 import { useVariable } from "@/editor/stores/variable";
+import { usePageDataStore } from "@/editor/stores/page-data";
 const ComponentMap: { [key: string]: any } = {
   Button: Button,
   Space: Space,
@@ -16,7 +17,8 @@ export const Stage: React.FC = () => {
   const { components, setCurComponentId, curComponentId, mode } =
     useComponents();
   const { variables } = useVariable();
-  const formatProps = useFormatProps(mode, variables);
+  const {data} = usePageDataStore()
+  const formatProps = useFormatProps(mode, variables, data);
 
   const selectedMaskRef = useRef<any>(null);
 

@@ -1,5 +1,6 @@
 import { ItemType } from "@/editor/item-type";
 import { Component, useComponents } from "@/editor/stores/components";
+import { useVariable } from "@/editor/stores/variable";
 import { getComponentById } from "@/editor/utils/getComponentById";
 import { Collapse, Input, Select, TreeSelect } from "antd";
 import { useCallback, useState } from "react";
@@ -29,6 +30,8 @@ export const componentMethodMap = {
 export const ComponentEvent: React.FC = () => {
   const { updateComponentProps, curComponentId, curComponent, components } =
     useComponents();
+
+  const { variables } = useVariable();
 
   const [selectedComponent, setSelectedComponent] =
     useState<Component | null>();
@@ -100,7 +103,7 @@ export const ComponentEvent: React.FC = () => {
 
   const componentMethodChange = useCallback(
     (eventName: string, value: string) => {
-      if (!curComponentId) return null;
+      if (!curComponentId) return;
 
       updateComponentProps(curComponentId, {
         [eventName]: {
@@ -108,6 +111,40 @@ export const ComponentEvent: React.FC = () => {
           config: {
             ...curComponent?.props?.[eventName]?.config,
             method: value,
+          },
+        },
+      });
+    },
+    [curComponentId, updateComponentProps]
+  );
+
+  //变量改变
+  const variableChange = useCallback(
+    (eventName: string, value: string) => {
+      if (!curComponentId) return;
+      updateComponentProps(curComponentId, {
+        [eventName]: {
+          ...curComponent?.props?.[eventName],
+          config: {
+            ...curComponent?.props?.[eventName]?.config,
+            variable: value,
+          },
+        },
+      });
+    },
+    [curComponentId, updateComponentProps]
+  );
+
+  //变量值改变
+  const variableValueChange = useCallback(
+    (eventName: string, value: string) => {
+      if (!curComponentId) return;
+      updateComponentProps(curComponentId, {
+        [eventName]: {
+          ...curComponent?.props?.[eventName],
+          config: {
+            ...curComponent?.props?.[eventName]?.config,
+            value,
           },
         },
       });
@@ -130,6 +167,7 @@ export const ComponentEvent: React.FC = () => {
                     options={[
                       { label: "显示提示", value: "showMessage" },
                       { label: "组件方法", value: "componentFunction" },
+                      { label: "设置变量", value: "setVariable" },
                     ]}
                     onChange={(value) => {
                       typeChange(setting.name, value);
@@ -224,6 +262,48 @@ export const ComponentEvent: React.FC = () => {
                             componentMethodChange(setting?.name, value);
                           }}
                         ></Select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {curComponent?.props?.[setting.name]?.type === "setVariable" && (
+                <div className="flex flex-col gap-[12px] mt-[12px]">
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  >
+                    <div>变量：</div>
+                    <div>
+                      <Select
+                        className="w-[160px]"
+                        options={variables?.map((item) => ({
+                          label: item.remark,
+                          value: item.name,
+                        }))}
+                        value={
+                          curComponent?.props?.[setting.name]?.config?.variable
+                        }
+                        onChange={(value) => {
+                          variableChange(setting.name, value);
+                        }}
+                      ></Select>
+                    </div>
+                  </div>
+                  {curComponent?.props?.[setting.name]?.config?.variable && (
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <div>值： </div>
+                      <div>
+                        <Input
+                          className="w-[160px]"
+                          value={
+                            curComponent?.props?.[setting.name]?.config?.value
+                          }
+                          onChange={(e) => {
+                            variableValueChange(setting.name, e.target.value);
+                          }}
+                        ></Input>
                       </div>
                     </div>
                   )}

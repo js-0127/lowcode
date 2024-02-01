@@ -3,7 +3,8 @@ import { Variable } from "@/editor/stores/variable";
 
 export const useFormatProps = (
   mode: "edit" | "preview",
-  variables: Variable[]
+  variables: Variable[],
+  data: any
 ) => {
   return (component: Component) => {
     const props = Object.keys(component.props).reduce<any>((prev, cur) => {
@@ -18,7 +19,7 @@ export const useFormatProps = (
             const variable = variables.find(
               (item) => item.name === variableName
             );
-            prev[cur] = variable?.defaultValue;
+            prev[cur] = data[variableName] || variable?.defaultValue;
           }
         }
       } else {

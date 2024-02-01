@@ -41,25 +41,6 @@ const componentSettingMap = {
       label: "文本",
       type: "input",
     },
-    {
-      name: "size",
-      label: "按钮大小",
-      type: "select",
-      options: [
-        {
-          label: "大",
-          value: "large",
-        },
-        {
-          label: "中",
-          value: "middle",
-        },
-        {
-          label: "小",
-          value: "small",
-        },
-      ],
-    },
   ],
   [ItemType.Space]: [
     {

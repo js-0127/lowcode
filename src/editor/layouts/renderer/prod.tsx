@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { message } from "antd";
 import { Component, useComponents } from "@/editor/stores/components";
 import Space from "@/editor/components/space";
@@ -21,6 +21,21 @@ export const ProdStage: React.FC = () => {
 
   const formatProps = useFormatProps(mode, variables, data);
   const componentRefs = useRef<any>({});
+
+  //动态脚本
+  const execScript = (script: string) => {
+    const func = new Function("ctx", script);
+    const ctx = { getComponentRef, setData };
+    func(ctx);
+  };
+
+  //获取组件ref
+  const getComponentRef = useCallback(
+    (componentId: number) => {
+      return componentRefs.current?.[componentId];
+    },
+    [componentRefs]
+  );
 
   function handleEvent(component: Component) {
     const props: any = {};
@@ -45,10 +60,13 @@ export const ProdStage: React.FC = () => {
               }
             } else if (type === "setVariable") {
               const { variable, value } = config;
-
               if (variable && value) {
                 setData(variable, value);
               }
+            } else if (type === "execScript") {
+              console.log(111);
+
+              execScript(config.script);
             }
           };
         }

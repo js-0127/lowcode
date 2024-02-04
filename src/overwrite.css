@@ -86,19 +86,6 @@
   color: rgb(124, 77, 255) !important;
 }
 
-/* .ant-menu-submenu-selected .ant-menu-title-content a {
-    color: rgb(124, 77, 255) !important;
-  } */
-
-/* .dark .ant-menu-submenu-selected .ant-menu-title-content a {
-    color: rgb(124, 77, 255) !important;
-  } */
-
-/* 
-  .light .ant-menu-submenu-selected .ant-menu-title-content a {
-    color: rgb(124, 77, 255) !important;
-  } */
-
 .dark .ant-menu-title-content a {
   color: #ffffff !important;
 }

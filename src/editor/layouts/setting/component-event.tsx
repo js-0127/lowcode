@@ -32,7 +32,6 @@ export const ComponentEvent: React.FC = () => {
     useComponents();
 
   const { variables } = useVariable();
-
   const [selectedComponent, setSelectedComponent] =
     useState<Component | null>();
 
@@ -152,6 +151,24 @@ export const ComponentEvent: React.FC = () => {
     [curComponentId, updateComponentProps]
   );
 
+  //脚本改变
+  const scriptChange = useCallback(
+    (eventName: string, value: string) => {
+      if (!curComponentId) return;
+      updateComponentProps(curComponentId, {
+        [eventName]: {
+          ...curComponent?.props?.[eventName],
+          config: {
+            ...curComponent?.props?.[eventName]?.config,
+            script: value,
+          },
+        },
+      });
+    },
+    [curComponentId, updateComponentProps]
+  );
+  console.log(curComponent?.props);
+
   if (!curComponent) return null;
   return (
     <div className="px-[12px]">
@@ -168,6 +185,7 @@ export const ComponentEvent: React.FC = () => {
                       { label: "显示提示", value: "showMessage" },
                       { label: "组件方法", value: "componentFunction" },
                       { label: "设置变量", value: "setVariable" },
+                      { label: "动态脚本", value: "execScript" },
                     ]}
                     onChange={(value) => {
                       typeChange(setting.name, value);
@@ -307,6 +325,31 @@ export const ComponentEvent: React.FC = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+              {curComponent?.props?.[setting.name]?.type === "execScript" && (
+                <div className="flex flex-col gap-[12px] mt-[12px]">
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 10 }}
+                  >
+                    <div>脚本：</div>
+                    <div>
+                      <Input.TextArea
+                        rows={6}
+                        style={{ width: 160 }}
+                        defaultValue={`(function(ctx){
+                          //TODO
+                   
+                        })(ctx)`}
+                        value={
+                          curComponent?.props?.[setting.name]?.config?.script
+                        }
+                        onChange={(e) => {
+                          scriptChange(setting.name, e.target.value);
+                        }}
+                      ></Input.TextArea>
+                    </div>
+                  </div>
                 </div>
               )}
             </Collapse.Panel>

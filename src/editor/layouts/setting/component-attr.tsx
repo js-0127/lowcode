@@ -7,6 +7,11 @@ import { useEffect } from "react";
 const componentSettingMap = {
   [ItemType.Button]: [
     {
+      name: "id",
+      label: "组件id",
+      type: "input",
+    },
+    {
       name: "type",
       label: "按钮类型",
       type: "select",
@@ -44,6 +49,11 @@ const componentSettingMap = {
   ],
   [ItemType.Space]: [
     {
+      name: "id",
+      label: "组件id",
+      type: "input",
+    },
+    {
       name: "size",
       label: "间距大小",
       type: "select",
@@ -64,7 +74,6 @@ const componentSettingMap = {
     },
   ],
 };
-
 export const ComponentAttr: React.FC = () => {
   const { curComponentId, curComponent, updateComponentProps } =
     useComponents();
@@ -72,21 +81,20 @@ export const ComponentAttr: React.FC = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    form.setFieldsValue(curComponent?.props);
-  }, [curComponent]);
-
+    form.setFieldsValue({ id: curComponentId, ...curComponent?.props });
+  }, [curComponent, curComponentId]);
   /**
    * 动态渲染表单元素
    * @param setting 元素配置
    * @returns
    */
   function renderFormElement(setting: any) {
-    const { type, options } = setting;
+    const { type, options, name } = setting;
 
     if (type === "select") {
       return <Select options={options} />;
     } else if (type === "input") {
-      return <SettingFormItemInput />;
+      return <SettingFormItemInput name={name} />;
     }
   }
 
@@ -96,8 +104,6 @@ export const ComponentAttr: React.FC = () => {
    */
   function valueChange(changeValues: any) {
     if (curComponentId) {
-      console.log(changeValues);
-
       updateComponentProps(curComponentId, changeValues);
     }
   }

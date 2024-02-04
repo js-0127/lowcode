@@ -1,4 +1,5 @@
 import { SelectVariableModal } from "@/editor/common/select-variable-modal";
+import { useComponents } from "@/editor/stores/components";
 import { SettingOutlined } from "@ant-design/icons";
 import { Input } from "antd";
 import { useCallback, useState } from "react";
@@ -9,10 +10,15 @@ interface Value {
 
 interface Props {
   value?: Value;
+  name?: string;
   onChange?: (value: Value) => void;
 }
 
-export const SettingFormItemInput: React.FC<Props> = ({ value, onChange }) => {
+export const SettingFormItemInput: React.FC<Props> = ({
+  name,
+  value,
+  onChange,
+}) => {
   const [visible, setVisible] = useState<boolean>(false);
 
   const valueChange = useCallback(
@@ -37,28 +43,35 @@ export const SettingFormItemInput: React.FC<Props> = ({ value, onChange }) => {
     },
     [onChange]
   );
-
+  const { curComponentId } = useComponents();
   return (
     <div className="flex gap-[8px]">
-      <Input
-        disabled={value?.type === "variable"}
-        value={value?.type === "static" || !value ? value?.value : ""}
-        onChange={valueChange}
-      />
-      <SettingOutlined
-        onClick={() => {
-          setVisible(true);
-        }}
-        className="cursor-pointer"
-        style={{ color: value?.type === "variable" ? "blue" : "" }}
-      ></SettingOutlined>
-      <SelectVariableModal
-        open={visible}
-        onCancle={() => {
-          setVisible(false);
-        }}
-        onSelect={select}
-      />
+      {name === "id" && (
+        <Input disabled={true} value={curComponentId as number} onChange={valueChange} />
+      )}
+      {name !== "id" && (
+        <>
+          <Input
+            disabled={value?.type === "variable"}
+            value={value?.type === "static" || !value ? value?.value : ""}
+            onChange={valueChange}
+          />
+          <SettingOutlined
+            onClick={() => {
+              setVisible(true);
+            }}
+            className="cursor-pointer"
+            style={{ color: value?.type === "variable" ? "blue" : "" }}
+          ></SettingOutlined>
+          <SelectVariableModal
+            open={visible}
+            onCancle={() => {
+              setVisible(false);
+            }}
+            onSelect={select}
+          />
+        </>
+      )}
     </div>
   );
 };
